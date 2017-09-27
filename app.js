@@ -35,6 +35,9 @@ io.on('connection', function(client) {
         let rand = Math.random().toString(36);
         io.to(room).emit("testEcho", `echo ${rand}`);
     })
+    client.on('disconnect', function(data) {
+        console.log(`Client disconnected to room ${room}`);
+    })
 });
 
 app.use(function(req, res, next) {
