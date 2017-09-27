@@ -9,9 +9,7 @@ let Service = {
         socket.emit(action, data)
     }
 }
-socket.on('connect', function(data) {
-    // console.log(data)
-});
+
 const Hello = {
     oninit: function() {
         socket.on('testEcho', function(data) {

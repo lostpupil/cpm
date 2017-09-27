@@ -32,8 +32,8 @@ io.on('connection', function(client) {
     console.log(`Client connected to room ${room}`);
     client.join(room);
     client.on('test', function(data) {
-      let rand = Math.random().toString(36);
-      io.to(room).emit("testEcho", `echo ${rand}`);
+        let rand = Math.random().toString(36);
+        io.to(room).emit("testEcho", `echo ${rand}`);
     })
 });
 
