@@ -12,38 +12,50 @@ let Service = {
     requests: [],
     responds: [],
     data: [],
-    sendEvent: function (action, data) {
+    sendEvent: function(action, data) {
         socket.emit(action, data)
     },
 }
 
 let Banana = {
-    sum: function (args) {
+    sum: function(args) {
         return _.sum(args)
+    },
+    max: function(args) {
+        return _.max(args)
+    },
+    min: function(args) {
+        return _.min(args)
+    },
+    multi: function(args) {
+        return _.reduce(args, function(a, b) {
+            return a * b
+        })
     }
 }
 const Hello = {
-    oninit: function () {
+    oninit: function() {
         socket.on('connect', () => {
             Service.sender = socket.id;
             m.redraw()
         });
         socket.on('dispatch', (data) => {
+            try {
+                var computed = Banana[data.action](data.data)
+            } catch (e) {
+                var computed = 'invalid function call in this client'
+            }
+
             let result = {
                 origin: data,
-                sender: Service.sender
+                sender: Service.sender,
+                result: computed
             }
             Service.sendEvent('aggregate', result)
         })
         socket.on('result', (data) => {
             console.log(data)
-            try {
-                let result = Banana[data.origin.action](data.origin.data)
-                Service.responds.push(`from: ${data.origin.sender} action: ${data.origin.action} producer: ${data.sender} result: ${result}`)
-            } catch (e) {
-                console.log(e)
-                Service.responds.push(`undefined function`)
-            }
+            Service.responds.push(`from: ${data.origin.sender} action: ${data.origin.action} producer: ${data.sender} result: ${data.result}`)
         })
         socket.on('requestEcho', (data) => {
             Service.msg = data.msg
@@ -51,7 +63,7 @@ const Hello = {
             m.redraw()
         })
     },
-    view: function () {
+    view: function() {
         return m("main", [
             m('div.pure-g', [
                 m('div.pure-u-1-3', [
@@ -77,14 +89,14 @@ const Hello = {
                             m('legend', "some operations"),
                             m('div.pure-control-grou', [
                                 m("input", {
-                                    oninput: m.withAttr("value", function (value) {
+                                    oninput: m.withAttr("value", function(value) {
                                         Service.action = value
                                     })
                                 }),
                             ]),
                             m('div.pure-control-grou', [
                                 m("input", {
-                                    oninput: m.withAttr("value", function (value) {
+                                    oninput: m.withAttr("value", function(value) {
                                         Service.data = _.map(value.split(','), function(item) {
                                             return parseInt(item)
                                         })
@@ -94,7 +106,7 @@ const Hello = {
 
                             m("button", {
                                 class: "pure-button pure-button-primary",
-                                onclick: function () {
+                                onclick: function() {
                                     Service.requests.push(`${Service.sender} request ${Service.action}`)
                                     Service.sendEvent('request', {
                                         action: Service.action,
