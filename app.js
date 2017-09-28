@@ -32,11 +32,11 @@ io.on('connection', function(client) {
     console.log(`Client connected to room ${room}`);
     client.join(room);
 
-    client.on('test', function(data) {
+    client.on('request', function(data) {
         let rand = Math.random().toString(36);
         let buddies = Object.keys(io.sockets.sockets);
         io.emit("dispatch", data)
-        io.to(room).emit("testEcho", {
+        io.to(room).emit("requestEcho", {
             msg: rand,
             buddies: buddies.length
         });

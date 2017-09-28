@@ -29,7 +29,7 @@ const Hello = {
         socket.on('result', (data) => {
             console.log(data)
         })
-        socket.on('testEcho', (data) => {
+        socket.on('requestEcho', (data) => {
             Service.msg = data.msg
             Service.buddies = data.buddies
             m.redraw()
@@ -37,24 +37,24 @@ const Hello = {
     },
     view: function() {
         return m("main", [
-            m("div", [
-                m('span', `buddies: ${Service.buddies} ${Service.sender}: `),
-                m('span', Service.msg)
-            ]),
-            m("input", {
-                oninput: m.withAttr("value", function(value) {
-                    Service.action = value
-                })
-            }),
-            m("button", {
-                onclick: function() {
-                    Service.sendEvent('test', {
-                        action: Service.action,
-                        sender: Service.sender,
-                        data: {}
-                    })
-                }
-            }, "Button")
+            // m("div", [
+            //     m('span', `buddies: ${Service.buddies} ${Service.sender}: `),
+            //     m('span', Service.msg)
+            // ]),
+            // m("input", {
+            //     oninput: m.withAttr("value", function(value) {
+            //         Service.action = value
+            //     })
+            // }),
+            // m("button", {
+            //     onclick: function() {
+            //         Service.sendEvent('request', {
+            //             action: Service.action,
+            //             sender: Service.sender,
+            //             data: {}
+            //         })
+            //     }
+            // }, "Button")
         ])
     },
 }
