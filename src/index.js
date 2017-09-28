@@ -37,8 +37,13 @@ const Hello = {
         })
         socket.on('result', (data) => {
             console.log(data)
-            Service.responds.push(`from: ${data.origin.sender} action: ${data.origin.action} producer: ${data.sender}`)
-            Banana[data.origin.action](data.origin.data)
+            try {
+                let result = Banana[data.origin.action](data.origin.data)
+                Service.responds.push(`from: ${data.origin.sender} action: ${data.origin.action} producer: ${data.sender} result: ${result}`)
+            } catch (e) {
+                console.log(e)
+                Service.responds.push(`undefined function`)
+            }
         })
         socket.on('requestEcho', (data) => {
             Service.msg = data.msg
@@ -80,7 +85,9 @@ const Hello = {
                             m('div.pure-control-grou', [
                                 m("input", {
                                     oninput: m.withAttr("value", function (value) {
-                                        Service.data = value.split(',')
+                                        Service.data = _.map(value.split(','), function(item) {
+                                            return parseInt(item)
+                                        })
                                     })
                                 }),
                             ]),
