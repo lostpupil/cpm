@@ -28,15 +28,24 @@ var server = require('http').Server(app);
 var io = require('socket.io')(server);
 
 io.on('connection', function(client) {
-    let room = Math.random().toString(36);
+    let room = client.id;
     console.log(`Client connected to room ${room}`);
     client.join(room);
+
     client.on('test', function(data) {
         let rand = Math.random().toString(36);
-        io.to(room).emit("testEcho", `echo ${rand}`);
+        let buddies = Object.keys(io.sockets.sockets);
+        io.emit("dispatch", data)
+        io.to(room).emit("testEcho", {
+            msg: rand,
+            buddies: buddies.length
+        });
+    })
+    client.on('aggregate', function(data) {
+        io.to(data.origin.sender).emit('result', data)
     })
     client.on('disconnect', function(data) {
-        console.log(`Client disconnected to room ${room}`);
+        console.log(`Client disconnected`);
     })
 });
 

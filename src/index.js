@@ -3,39 +3,60 @@ import io from 'socket.io-client'
 const socket = io('http://localhost:3000');
 
 let Service = {
-    list: [1, 2, 3],
-    name: 'Hello From Native',
+    action: '',
+    msg: 'Ahoyi',
+    buddies: 0,
+    sender: '',
     sendEvent: function(action, data) {
         socket.emit(action, data)
-    }
+    },
 }
 
 const Hello = {
     oninit: function() {
-        socket.on('testEcho', function(data) {
-            Service.name = data
+        socket.on('connect', () => {
+            Service.sender = socket.id;
+            m.redraw()
+        });
+        socket.on('dispatch', (data) => {
+            let result = {
+                origin: data,
+                result: 1,
+                sender: Service.sender
+            }
+            Service.sendEvent('aggregate', result)
+        })
+        socket.on('result', (data) => {
+            console.log(data)
+        })
+        socket.on('testEcho', (data) => {
+            Service.msg = data.msg
+            Service.buddies = data.buddies
             m.redraw()
         })
     },
     view: function() {
         return m("main", [
-            m("h1", {
-                class: "title"
-            }, Service.name),
-            m("ul", Service.list.map(function(item) {
-                return m("li", item)
-            })),
+            m("div", [
+                m('span', `buddies: ${Service.buddies} ${Service.sender}: `),
+                m('span', Service.msg)
+            ]),
+            m("input", {
+                oninput: m.withAttr("value", function(value) {
+                    Service.action = value
+                })
+            }),
             m("button", {
                 onclick: function() {
                     Service.sendEvent('test', {
-                        action: 'a',
-                        data: [1, 2, 3]
+                        action: Service.action,
+                        sender: Service.sender,
+                        data: {}
                     })
                 }
-            }, "Button"),
+            }, "Button")
         ])
     },
-
 }
 
 m.route(document.body, "/", {
