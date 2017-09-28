@@ -51,6 +51,7 @@ const Hello = {
                 sender: Service.sender,
                 result: computed
             }
+
             Service.sendEvent('aggregate', result)
         })
         socket.on('result', (data) => {
